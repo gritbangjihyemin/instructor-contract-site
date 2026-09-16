@@ -246,7 +246,6 @@ th { color: var(--text-muted); font-weight: 600; background: #fafbfa; }
   right: 10px;
   width: 52px;
   height: 52px;
-  transform: rotate(-8deg);
   opacity: 0.92;
 }
 .contract-doc .clause { margin: 14px 0; white-space: pre-line; }
