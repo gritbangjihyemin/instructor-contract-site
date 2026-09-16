@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>제출 현황</title>
+<link rel="stylesheet" href="assets/style.css" />
+</head>
+<body>
+
+<header class="topbar">
+  <h1>제출 현황</h1>
+  <div class="actions"><a href="index.html" class="btn secondary">← 목록으로</a></div>
+</header>
+
+<div class="wrap">
+
+  <div id="auth-gate" class="card hidden">
+    <p>로그인이 필요합니다. <a href="index.html">관리자 로그인으로 이동</a></p>
+  </div>
+
+  <div id="content" class="hidden">
+    <div class="card" id="program-summary"></div>
+
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+        <h2 style="margin:0">제출된 강사 목록</h2>
+        <button id="export-excel-btn">엑셀 다운로드</button>
+      </div>
+      <div style="overflow-x:auto;margin-top:12px;">
+        <table id="submission-table">
+          <thead>
+            <tr>
+              <th>제출시각</th><th>강사명</th><th>주민등록번호</th><th>원천징수구분</th>
+              <th>은행</th><th>예금주</th><th>계좌번호</th><th>계약서</th>
+            </tr>
+          </thead>
+          <tbody id="submission-tbody"></tbody>
+        </table>
+      </div>
+      <p class="hint" id="no-submission-hint" style="display:none;color:var(--text-muted)">아직 제출된 강사가 없습니다.</p>
+    </div>
+  </div>
+
+</div>
+
+<!-- 계약서 보기 모달 -->
+<div class="modal-backdrop hidden" id="contract-modal">
+  <div class="modal-box" style="max-width:700px">
+    <div class="btn-row no-print" style="margin-bottom:12px;justify-content:flex-end">
+      <button id="contract-download-btn">PDF 다운로드</button>
+      <button class="secondary" id="contract-close-btn">닫기</button>
+    </div>
+    <div class="contract-doc" id="contract-view"></div>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore-compat.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="assets/firebase-config.js"></script>
+<script src="assets/contract.js"></script>
+<script src="assets/detail.js"></script>
+</body>
+</html>

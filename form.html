@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>강사 계약 정보 입력</title>
+<link rel="stylesheet" href="assets/style.css" />
+</head>
+<body>
+
+<header class="topbar">
+  <h1>강사 계약 정보 입력</h1>
+</header>
+
+<div class="wrap narrow">
+
+  <div id="loading-msg" class="card">불러오는 중...</div>
+  <div id="not-found-msg" class="card hidden">
+    <p class="error-msg" style="margin:0">이 링크가 유효하지 않거나 마감된 프로그램입니다. 담당자에게 문의해주세요.</p>
+  </div>
+
+  <div id="program-info" class="card hidden"></div>
+
+  <form id="instructor-form" class="card hidden">
+    <h2 style="margin-top:0">강사 정보 입력</h2>
+
+    <div class="field">
+      <label>강사명 *</label>
+      <input type="text" id="f-name" required />
+    </div>
+
+    <div class="field">
+      <label>주민등록번호 *</label>
+      <input type="text" id="f-rrn" placeholder="000000-0000000" maxlength="14" required />
+      <div class="hint">세무서 원천징수 신고 목적으로만 사용되며, 관리자 외에는 조회할 수 없습니다.</div>
+    </div>
+
+    <div class="field">
+      <label>은행명 *</label>
+      <select id="f-bank" required>
+        <option value="">선택하세요</option>
+        <option>KB국민은행</option><option>신한은행</option><option>우리은행</option>
+        <option>하나은행</option><option>NH농협은행</option><option>IBK기업은행</option>
+        <option>카카오뱅크</option><option>토스뱅크</option><option>새마을금고</option>
+        <option>신협</option><option>우체국</option><option>SC제일은행</option>
+        <option>부산은행</option><option>대구은행</option><option>광주은행</option>
+        <option>경남은행</option><option>전북은행</option><option>수협은행</option>
+        <option>기타</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label>예금주(계좌명) *</label>
+      <input type="text" id="f-holder" required />
+    </div>
+
+    <div class="field">
+      <label>계좌번호 *</label>
+      <input type="text" id="f-account" inputmode="numeric" placeholder="-없이 숫자만 입력" required />
+    </div>
+
+    <div class="field">
+      <label>원천징수 구분 *</label>
+      <div class="radio-group">
+        <label><input type="radio" name="withholding" value="사업소득" checked /> 사업소득 (3.3%)</label>
+        <label><input type="radio" name="withholding" value="기타소득" /> 기타소득 (8.8%)</label>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>서명 *</label>
+      <div class="signature-pad-wrap">
+        <canvas id="signature-pad"></canvas>
+      </div>
+      <div class="btn-row">
+        <button type="button" class="secondary" id="sig-clear">서명 지우기</button>
+      </div>
+      <div class="hint">마우스나 손가락으로 위 칸에 직접 서명해주세요.</div>
+    </div>
+
+    <div class="field">
+      <label><input type="checkbox" id="f-confirm" required /> 위 내용이 사실과 다름없음을 확인하며, 개인정보 수집·이용(세무 신고 목적)에 동의합니다.</label>
+    </div>
+
+    <div class="error-msg" id="form-error"></div>
+    <button type="submit" id="submit-btn">제출하기</button>
+  </form>
+
+  <div id="done-view" class="hidden">
+    <div class="card">
+      <p class="success-msg">제출이 완료되었습니다. 감사합니다!</p>
+      <div class="btn-row">
+        <button id="download-pdf-btn">계약서 PDF 다운로드</button>
+        <button class="secondary" id="print-btn">인쇄하기</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="contract-doc" id="contract-preview"></div>
+    </div>
+  </div>
+
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore-compat.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="assets/firebase-config.js"></script>
+<script src="assets/contract.js"></script>
+<script src="assets/form.js"></script>
+</body>
+</html>

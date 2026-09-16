@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>강사계약 관리</title>
+<link rel="stylesheet" href="assets/style.css" />
+</head>
+<body>
+
+<header class="topbar">
+  <h1>강사계약 관리</h1>
+  <div class="actions" id="topbar-actions"></div>
+</header>
+
+<!-- 로그인 화면 -->
+<div class="wrap narrow" id="login-view">
+  <div class="card">
+    <h2 style="margin-top:0">관리자 로그인</h2>
+    <div class="field">
+      <label>이메일</label>
+      <input type="email" id="login-email" placeholder="admin@example.com" />
+    </div>
+    <div class="field">
+      <label>비밀번호</label>
+      <input type="password" id="login-password" />
+    </div>
+    <button id="login-btn">로그인</button>
+    <div class="error-msg" id="login-error"></div>
+    <p class="hint" style="margin-top:16px;color:var(--text-muted)">
+      관리자 계정이 없다면 SETUP.md의 안내에 따라 Firebase 콘솔 &gt; Authentication에서 이메일/비밀번호 계정을 먼저 만들어주세요.
+    </p>
+  </div>
+</div>
+
+<!-- 관리자 대시보드 -->
+<div class="wrap hidden" id="dashboard-view">
+
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+      <h2 style="margin:0">프로그램 목록</h2>
+      <div class="btn-row" style="margin:0">
+        <button class="secondary" id="open-company-settings">회사(발주처) 정보 설정</button>
+        <button id="open-new-program">+ 새 프로그램 만들기</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="program-list"></div>
+  <p class="hint" id="empty-hint" style="display:none;color:var(--text-muted)">아직 만든 프로그램이 없습니다. "새 프로그램 만들기"로 시작하세요.</p>
+</div>
+
+<!-- 새 프로그램 만들기 모달 -->
+<div class="modal-backdrop hidden" id="new-program-modal">
+  <div class="modal-box">
+    <h3 style="margin-top:0">새 프로그램 만들기</h3>
+    <div class="field">
+      <label>프로그램명</label>
+      <input type="text" id="np-name" placeholder="예: OO대학 자기소개서 특강" />
+    </div>
+    <div class="field">
+      <label>강의 일시</label>
+      <input type="text" id="np-datetime" placeholder="예: 2026-10-05 14:00~16:00" />
+    </div>
+    <div class="field">
+      <label>강사비</label>
+      <input type="number" id="np-fee" placeholder="숫자만 입력 (원)" />
+    </div>
+    <div class="field">
+      <label>출장여비</label>
+      <input type="number" id="np-travel" placeholder="숫자만 입력 (원, 없으면 0)" />
+    </div>
+    <div class="field">
+      <label>기타</label>
+      <textarea id="np-etc" placeholder="특이사항, 준비물, 참고사항 등 (선택)"></textarea>
+    </div>
+    <div class="error-msg" id="np-error"></div>
+    <div class="btn-row">
+      <button id="np-submit">만들기</button>
+      <button class="secondary" id="np-cancel">취소</button>
+    </div>
+  </div>
+</div>
+
+<!-- 회사 정보 설정 모달 -->
+<div class="modal-backdrop hidden" id="company-modal">
+  <div class="modal-box">
+    <h3 style="margin-top:0">회사(발주처) 정보</h3>
+    <p class="hint" style="color:var(--text-muted);margin-top:-6px">계약서의 "갑" 정보로 사용됩니다. 한 번만 입력해두면 모든 계약서에 자동 반영돼요.</p>
+    <div class="field">
+      <label>회사명</label>
+      <input type="text" id="cs-name" />
+    </div>
+    <div class="field">
+      <label>사업자등록번호</label>
+      <input type="text" id="cs-bizregno" placeholder="000-00-00000" />
+    </div>
+    <div class="field">
+      <label>대표자명</label>
+      <input type="text" id="cs-ceo" />
+    </div>
+    <div class="field">
+      <label>주소</label>
+      <input type="text" id="cs-address" />
+    </div>
+    <div class="field">
+      <label>연락처</label>
+      <input type="text" id="cs-phone" />
+    </div>
+    <div class="error-msg" id="cs-error"></div>
+    <div class="btn-row">
+      <button id="cs-submit">저장</button>
+      <button class="secondary" id="cs-cancel">취소</button>
+    </div>
+  </div>
+</div>
+
+<!-- 링크 안내 모달 -->
+<div class="modal-backdrop hidden" id="link-modal">
+  <div class="modal-box">
+    <h3 style="margin-top:0">프로그램이 생성되었습니다</h3>
+    <p>아래 링크를 강사님들께 전달하세요. 이 프로그램에 참여하는 모든 강사가 같은 링크로 각자 입력합니다.</p>
+    <div class="link-box" id="link-box-text"></div>
+    <div class="btn-row">
+      <button id="link-copy-btn">링크 복사</button>
+      <button class="secondary" id="link-close-btn">닫기</button>
+    </div>
+  </div>
+</div>
+
+<p class="footer-note wrap">이 페이지는 관리자 전용입니다. 강사님께는 프로그램별 입력 링크만 전달하세요.</p>
+
+<!-- Firebase SDK (compat 버전 - 별도 빌드 도구 없이 사용 가능) -->
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore-compat.js"></script>
+<script src="assets/firebase-config.js"></script>
+<script src="assets/admin.js"></script>
+</body>
+</html>

@@ -1,0 +1,60 @@
+rules_version = '2';
+
+// ===================================================================
+// Firestore 보안 규칙
+// Firebase 콘솔 > Firestore Database > 규칙 탭에 이 내용 전체를 붙여넣고 "게시"하세요.
+//
+// 핵심 원칙
+// - 강사가 입력한 개인정보(주민등록번호/계좌정보 등)는 "관리자로 로그인한 사람"만 조회 가능
+// - 강사는 로그인 없이 자기 정보를 "제출(생성)"만 할 수 있고, 다른 사람 정보는 읽을 수 없음
+// - 프로그램 정보(강의명/일시/강사비 등)는 링크를 아는 사람만 개별 조회 가능,
+//   전체 목록 조회(list)는 관리자만 가능
+// ===================================================================
+
+function isAdmin() {
+  return request.auth != null;
+}
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // 회사(발주처) 정보 - 계약서에 들어가는 갑(甲) 정보.
+    // 사업자 정보(회사명/사업자번호/대표자 등)는 개인정보가 아니므로 강사가 계약서를 확인할 때
+    // 볼 수 있도록 읽기는 공개하고, 수정은 관리자만 가능하도록 함.
+    match /settings/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // 프로그램(강의) 문서
+    match /programs/{programId} {
+      // 링크(프로그램 ID)를 아는 사람은 해당 프로그램 1건만 조회 가능 (강사 입력 폼에서 사용)
+      allow get: if true;
+      // 전체 목록 조회는 관리자만 (게시판 화면)
+      allow list: if isAdmin();
+      // 생성/수정/삭제는 관리자만
+      allow create, update, delete: if isAdmin();
+    }
+
+    // 강사 제출 정보 (주민등록번호, 계좌정보, 서명 포함 - 민감정보)
+    match /submissions/{submissionId} {
+      // 강사는 로그인 없이 "새로 제출"만 가능 (자기 자신의 정보를 생성)
+      allow create: if
+        request.resource.data.programId is string &&
+        request.resource.data.instructorName is string &&
+        request.resource.data.instructorName.size() > 0 &&
+        request.resource.data.rrn is string &&
+        request.resource.data.bankName is string &&
+        request.resource.data.accountHolder is string &&
+        request.resource.data.accountNumber is string &&
+        request.resource.data.withholdingType in ['사업소득', '기타소득'] &&
+        request.resource.data.signature is string;
+
+      // 제출된 정보의 조회(get/list), 수정, 삭제는 관리자만 가능
+      // -> 강사 본인도 제출 후에는 서버(Firestore)에서 다시 읽어올 수 없음(URL 공유 등으로 인한 유출 방지)
+      //    제출 직후 화면에 보여주는 계약서는 브라우저 메모리에 있는 값으로만 렌더링합니다.
+      allow read: if isAdmin();
+      allow update, delete: if isAdmin();
+    }
+  }
+}
