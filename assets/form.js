@@ -8,10 +8,12 @@ const pid = params.get("pid");
 const loadingMsg = document.getElementById("loading-msg");
 const notFoundMsg = document.getElementById("not-found-msg");
 const programInfoEl = document.getElementById("program-info");
+const noticeViewEl = document.getElementById("notice-view");
 const formEl = document.getElementById("instructor-form");
 const doneView = document.getElementById("done-view");
 
 let programData = null;
+let signaturePadReady = false;
 
 init();
 
@@ -30,14 +32,36 @@ async function init() {
     renderProgramInfo(programData);
     loadingMsg.classList.add("hidden");
     programInfoEl.classList.remove("hidden");
-    formEl.classList.remove("hidden");
-    setupSignaturePad();
+    noticeViewEl.classList.remove("hidden");
     setupRrnFormatting();
   } catch (e) {
     console.error(e);
     showNotFound();
   }
 }
+
+// ---------------------------------------------------------------
+// 강사 정보 입력 전 필수 확인사항 (강사비 지급 / 일정확인 / 유의사항)
+// ---------------------------------------------------------------
+
+document.getElementById("notice-continue-btn").addEventListener("click", () => {
+  const errEl = document.getElementById("notice-error");
+  const allChecked = ["notice-check-1", "notice-check-2", "notice-check-3"].every(
+    (id) => document.getElementById(id).checked
+  );
+  if (!allChecked) {
+    errEl.textContent = "안내사항 3가지를 모두 확인 후 체크해주셔야 다음 단계로 진행할 수 있습니다.";
+    return;
+  }
+  errEl.textContent = "";
+  noticeViewEl.classList.add("hidden");
+  formEl.classList.remove("hidden");
+  if (!signaturePadReady) {
+    setupSignaturePad();
+    signaturePadReady = true;
+  }
+  formEl.scrollIntoView({ behavior: "smooth", block: "start" });
+});
 
 function showNotFound() {
   loadingMsg.classList.add("hidden");
@@ -188,6 +212,7 @@ formEl.addEventListener("submit", async (evt) => {
     accountNumber,
     withholdingType,
     signature: signatureDataUrl,
+    agreedNotices: true,
   };
 
   try {
