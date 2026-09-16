@@ -242,10 +242,10 @@ th { color: var(--text-muted); font-weight: 600; background: #fafbfa; }
 .contract-doc .sign-img { max-height: 70px; border-bottom: 1px solid #333; }
 .contract-doc .seal-img {
   position: absolute;
-  top: -14px;
-  right: 0;
-  width: 78px;
-  height: 78px;
+  top: -9px;
+  right: 10px;
+  width: 52px;
+  height: 52px;
   transform: rotate(-8deg);
   opacity: 0.92;
 }
