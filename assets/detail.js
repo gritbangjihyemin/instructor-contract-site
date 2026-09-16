@@ -1,14 +1,14 @@
 // ===================================================================
 // 프로그램 상세 (제출 현황 / 엑셀 다운로드 / 계약서 PDF)
 // ===================================================================
-
+ 
 const dParams = new URLSearchParams(window.location.search);
 const dPid = dParams.get("pid");
-
+ 
 let dProgram = null;
 let dCompany = {};
 let dSubmissions = [];
-
+ 
 auth.onAuthStateChanged((user) => {
   if (user) {
     document.getElementById("auth-gate").classList.add("hidden");
@@ -19,32 +19,47 @@ auth.onAuthStateChanged((user) => {
     document.getElementById("content").classList.add("hidden");
   }
 });
-
+ 
 async function loadAll() {
   if (!dPid) {
     document.getElementById("program-summary").innerHTML = "<p class='error-msg'>잘못된 접근입니다.</p>";
     return;
   }
-
-  const [progDoc, companyDoc, subSnap] = await Promise.all([
-    db.collection("programs").doc(dPid).get(),
-    db.collection("settings").doc("company").get(),
-    db.collection("submissions").where("programId", "==", dPid).orderBy("submittedAt", "desc").get(),
-  ]);
-
+ 
+  let progDoc, companyDoc, subSnap;
+  try {
+    [progDoc, companyDoc, subSnap] = await Promise.all([
+      db.collection("programs").doc(dPid).get(),
+      db.collection("settings").doc("company").get(),
+      // programId 필터 + submittedAt 정렬을 Firestore 쿼리에서 함께 하면 별도의 복합 색인이 필요해
+      // 색인이 없는 경우 조회가 조용히 실패한다. 필터만 하고 정렬은 아래에서 직접 처리한다.
+      db.collection("submissions").where("programId", "==", dPid).get(),
+    ]);
+  } catch (e) {
+    console.error(e);
+    document.getElementById("program-summary").innerHTML =
+      "<p class='error-msg'>데이터를 불러오는 중 오류가 발생했습니다: " + escapeHtml(e.message || String(e)) + "</p>";
+    return;
+  }
+ 
   if (!progDoc.exists) {
     document.getElementById("program-summary").innerHTML = "<p class='error-msg'>존재하지 않는 프로그램입니다.</p>";
     return;
   }
-
+ 
   dProgram = progDoc.data();
   dCompany = companyDoc.exists ? companyDoc.data() : {};
   dSubmissions = subSnap.docs.map((d) => ({ id: d.id, ...d.data() }));
-
+  dSubmissions.sort((a, b) => {
+    const at = a.submittedAt && a.submittedAt.toMillis ? a.submittedAt.toMillis() : 0;
+    const bt = b.submittedAt && b.submittedAt.toMillis ? b.submittedAt.toMillis() : 0;
+    return bt - at;
+  });
+ 
   renderSummary();
   renderTable();
 }
-
+ 
 function renderSummary() {
   const el = document.getElementById("program-summary");
   el.innerHTML = `
@@ -57,7 +72,7 @@ function renderSummary() {
     </table>
   `;
 }
-
+ 
 function renderTable() {
   const tbody = document.getElementById("submission-tbody");
   const noHint = document.getElementById("no-submission-hint");
@@ -67,7 +82,7 @@ function renderTable() {
     return;
   }
   noHint.style.display = "none";
-
+ 
   tbody.innerHTML = dSubmissions
     .map(
       (s, idx) => `
@@ -83,7 +98,7 @@ function renderTable() {
     </tr>`
     )
     .join("");
-
+ 
   tbody.querySelectorAll(".rrn-cell").forEach((cell) => {
     cell.addEventListener("click", () => {
       const idx = Number(cell.dataset.idx);
@@ -92,12 +107,12 @@ function renderTable() {
       cell.dataset.revealed = revealed ? "false" : "true";
     });
   });
-
+ 
   tbody.querySelectorAll("button[data-view-idx]").forEach((btn) => {
     btn.addEventListener("click", () => openContractModal(Number(btn.dataset.viewIdx)));
   });
 }
-
+ 
 function openContractModal(idx) {
   const s = dSubmissions[idx];
   const viewEl = document.getElementById("contract-view");
@@ -108,11 +123,11 @@ function openContractModal(idx) {
 document.getElementById("contract-close-btn").addEventListener("click", () => {
   document.getElementById("contract-modal").classList.add("hidden");
 });
-
+ 
 // ---------------------------------------------------------------
 // 엑셀 다운로드 (세무서 제출용 - 원본 데이터 그대로)
 // ---------------------------------------------------------------
-
+ 
 document.getElementById("export-excel-btn").addEventListener("click", () => {
   if (dSubmissions.length === 0) {
     alert("내보낼 제출 데이터가 없습니다.");
@@ -135,5 +150,7 @@ document.getElementById("export-excel-btn").addEventListener("click", () => {
   XLSX.utils.book_append_sheet(wb, ws, "제출현황");
   XLSX.writeFile(wb, `${dProgram.name}_강사제출현황.xlsx`);
 });
-
+ 
 // won() / escapeHtml() / maskRRN() / fmtDate() 는 assets/contract.js 에 정의된 공용 유틸을 사용합니다.
+ 
+
