@@ -199,6 +199,17 @@ th { color: var(--text-muted); font-weight: 600; background: #fafbfa; }
   border: 1px solid var(--border);
   border-radius: 6px;
 }
+.notice-text p { margin: 0 0 12px; }
+.notice-text p:last-child { margin-bottom: 0; }
+.notice-callout {
+  background: #f0f4f2;
+  border: 1px dashed var(--primary);
+  border-radius: 6px;
+  padding: 8px 10px;
+  margin: 0 0 12px;
+  font-size: 12.5px;
+  line-height: 1.6;
+}
 .notice-check { display: flex; align-items: flex-start; gap: 8px; font-size: 13px; font-weight: 600; cursor: pointer; }
 .notice-check input { margin-top: 3px; }
 
