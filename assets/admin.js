@@ -127,6 +127,45 @@ function showLinkModal(link) {
       setTimeout(() => (document.getElementById("link-copy-btn").textContent = "링크 복사"), 1500);
     });
   };
+
+  // 짧은 링크: TinyURL 무료 단축 서비스를 사용한다.
+  // (별도 서버 없이 정적 사이트에서 바로 호출 가능 - fetch 응답을 텍스트로 그대로 받음)
+  const shortBoxEl = document.getElementById("short-link-box-text");
+  const shortCopyBtn = document.getElementById("short-link-copy-btn");
+  shortBoxEl.textContent = "짧은 링크 생성 중...";
+  shortCopyBtn.disabled = true;
+  shortCopyBtn.onclick = null;
+
+  shortenLinkViaTinyUrl(link)
+    .then((shortUrl) => {
+      shortBoxEl.textContent = shortUrl;
+      shortCopyBtn.disabled = false;
+      shortCopyBtn.onclick = () => {
+        navigator.clipboard.writeText(shortUrl).then(() => {
+          shortCopyBtn.textContent = "복사됨!";
+          setTimeout(() => (shortCopyBtn.textContent = "짧은 링크 복사"), 1500);
+        });
+      };
+    })
+    .catch(() => {
+      shortBoxEl.textContent = "짧은 링크 생성에 실패했습니다. 위 원본 링크를 이용해주세요.";
+    });
+}
+
+async function shortenLinkViaTinyUrl(url) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 8000);
+  try {
+    const res = await fetch(
+      "https://tinyurl.com/api-create.php?url=" + encodeURIComponent(url),
+      { signal: controller.signal }
+    );
+    const text = (await res.text()).trim();
+    if (!res.ok || !/^https?:\/\//.test(text)) throw new Error("shorten failed: " + text);
+    return text;
+  } finally {
+    clearTimeout(timer);
+  }
 }
 document.getElementById("link-close-btn").addEventListener("click", () => {
   document.getElementById("link-modal").classList.add("hidden");
