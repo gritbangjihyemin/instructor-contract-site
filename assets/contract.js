@@ -86,8 +86,9 @@ function renderContractHTML(company, program, submission, opts) {
     <p style="margin-top:24px;">계약일자: ${today}</p>
 
     <div class="sign-row">
-      <div class="sign-box">
+      <div class="sign-box seal-box">
         <div>갑: ${escapeHtml(c.companyName || "")} (인)</div>
+        <img class="seal-img" src="assets/seal.png" alt="직인" />
       </div>
       <div class="sign-box">
         <div>을: ${escapeHtml(s.instructorName || "")} (서명)</div>
