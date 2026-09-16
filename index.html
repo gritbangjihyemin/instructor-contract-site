@@ -59,8 +59,22 @@
       <input type="text" id="np-name" placeholder="예: OO대학 자기소개서 특강" />
     </div>
     <div class="field">
-      <label>강의 일시</label>
-      <input type="text" id="np-datetime" placeholder="예: 2026-10-05 14:00~16:00" />
+      <label>강의 시작</label>
+      <div class="field-row">
+        <input type="date" id="np-start-date" />
+        <select id="np-start-time"></select>
+      </div>
+    </div>
+    <div class="field">
+      <label>강의 종료 <span style="font-weight:400;color:var(--text-muted)">(선택)</span></label>
+      <div class="field-row">
+        <input type="date" id="np-end-date" />
+        <select id="np-end-time"></select>
+      </div>
+      <div class="hint">
+        하루짜리 강의는 종료 날짜를 비워두세요 (시간만 입력).<br/>
+        1박 2일, 며칠간, 한 달짜리처럼 여러 날에 걸치면 종료 날짜까지 입력하세요.
+      </div>
     </div>
     <div class="field">
       <label>강사비</label>
