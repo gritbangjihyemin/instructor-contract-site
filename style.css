@@ -11,24 +11,24 @@
   --radius: 10px;
   font-family: -apple-system, BlinkMacSystemFont, "Malgun Gothic", "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
 }
-
+ 
 * { box-sizing: border-box; }
-
+ 
 body {
   margin: 0;
   background: var(--bg);
   color: var(--text);
   line-height: 1.55;
 }
-
+ 
 .wrap {
   max-width: 880px;
   margin: 0 auto;
   padding: 24px 16px 80px;
 }
-
+ 
 .wrap.narrow { max-width: 620px; }
-
+ 
 header.topbar {
   display: flex;
   align-items: center;
@@ -37,22 +37,22 @@ header.topbar {
   background: var(--primary);
   color: #fff;
 }
-
+ 
 header.topbar h1 {
   font-size: 18px;
   margin: 0;
 }
-
+ 
 header.topbar .actions button,
 header.topbar .actions a {
   color: #fff;
   background: rgba(255,255,255,0.15);
   border: 1px solid rgba(255,255,255,0.35);
 }
-
+ 
 h2 { font-size: 20px; margin: 28px 0 12px; }
 h3 { font-size: 16px; margin: 20px 0 8px; }
-
+ 
 .card {
   background: var(--card-bg);
   border: 1px solid var(--border);
@@ -60,7 +60,7 @@ h3 { font-size: 16px; margin: 20px 0 8px; }
   padding: 20px;
   margin-bottom: 16px;
 }
-
+ 
 .field { margin-bottom: 14px; }
 .field label {
   display: block;
@@ -70,7 +70,7 @@ h3 { font-size: 16px; margin: 20px 0 8px; }
   margin-bottom: 6px;
 }
 .field .hint { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
-
+ 
 input[type="text"],
 input[type="password"],
 input[type="email"],
@@ -89,15 +89,15 @@ textarea {
   background: #fff;
   color: var(--text);
 }
-
+ 
 textarea { resize: vertical; min-height: 70px; }
-
+ 
 .field-row { display: flex; gap: 10px; }
 .field-row > input, .field-row > select { flex: 1; min-width: 0; }
-
+ 
 .radio-group { display: flex; gap: 16px; flex-wrap: wrap; }
 .radio-group label { display: flex; align-items: center; gap: 6px; font-weight: 500; color: var(--text); font-size: 14px; }
-
+ 
 button, .btn {
   display: inline-block;
   padding: 10px 16px;
@@ -122,9 +122,9 @@ button.danger, .btn.danger {
   border-color: var(--danger);
 }
 button:disabled { opacity: 0.5; cursor: not-allowed; }
-
+ 
 .btn-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
-
+ 
 table {
   width: 100%;
   border-collapse: collapse;
@@ -137,7 +137,7 @@ th, td {
   white-space: nowrap;
 }
 th { color: var(--text-muted); font-weight: 600; background: #fafbfa; }
-
+ 
 .program-item {
   display: flex;
   justify-content: space-between;
@@ -159,7 +159,7 @@ th { color: var(--text-muted); font-weight: 600; background: #fafbfa; }
 }
 .status.open { background: #e5f3ee; color: var(--primary); }
 .status.closed { background: #f3e5e5; color: var(--danger); }
-
+ 
 .badge {
   display: inline-block;
   font-size: 12px;
@@ -168,7 +168,7 @@ th { color: var(--text-muted); font-weight: 600; background: #fafbfa; }
   background: #eef1ef;
   color: var(--text-muted);
 }
-
+ 
 .link-box {
   display: flex;
   gap: 8px;
@@ -180,13 +180,31 @@ th { color: var(--text-muted); font-weight: 600; background: #fafbfa; }
   font-size: 13px;
   word-break: break-all;
 }
-
+ 
 .error-msg { color: var(--danger); font-size: 13px; margin-top: 6px; }
 .success-msg { color: var(--primary); font-weight: 600; }
-
+ 
+.notice-block { border: 1px solid var(--border); border-radius: 8px; padding: 14px; margin-bottom: 14px; background: #fafbfa; }
+.notice-block h4 { margin: 0 0 8px; font-size: 14px; color: var(--primary); }
+.notice-text {
+  white-space: pre-line;
+  font-size: 13px;
+  color: var(--text);
+  max-height: 180px;
+  overflow-y: auto;
+  padding: 10px;
+  margin-bottom: 10px;
+  line-height: 1.6;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+}
+.notice-check { display: flex; align-items: flex-start; gap: 8px; font-size: 13px; font-weight: 600; cursor: pointer; }
+.notice-check input { margin-top: 3px; }
+ 
 .signature-pad-wrap { border: 1px solid var(--border); border-radius: 8px; background: #fff; touch-action: none; }
 #signature-pad { display: block; width: 100%; height: 160px; cursor: crosshair; }
-
+ 
 .modal-backdrop {
   position: fixed; inset: 0; background: rgba(0,0,0,0.4);
   display: flex; align-items: center; justify-content: center;
@@ -197,7 +215,7 @@ th { color: var(--text-muted); font-weight: 600; background: #fafbfa; }
   max-width: 480px; width: 100%; max-height: 90vh; overflow-y: auto;
 }
 .hidden { display: none !important; }
-
+ 
 .contract-doc {
   background: #fff;
   padding: 40px;
@@ -209,14 +227,23 @@ th { color: var(--text-muted); font-weight: 600; background: #fafbfa; }
 .contract-doc table { margin: 12px 0; }
 .contract-doc table th, .contract-doc table td { border: 1px solid #999; padding: 6px 10px; white-space: normal; }
 .contract-doc .sign-row { display: flex; justify-content: space-between; margin-top: 40px; }
-.contract-doc .sign-box { width: 45%; }
+.contract-doc .sign-box { width: 45%; position: relative; padding-right: 70px; }
 .contract-doc .sign-img { max-height: 70px; border-bottom: 1px solid #333; }
+.contract-doc .seal-img {
+  position: absolute;
+  top: -14px;
+  right: 0;
+  width: 78px;
+  height: 78px;
+  transform: rotate(-8deg);
+  opacity: 0.92;
+}
 .contract-doc .clause { margin: 14px 0; white-space: pre-line; }
-
+ 
 @media print {
   header.topbar, .no-print { display: none !important; }
   body { background: #fff; }
   .contract-doc { padding: 0; }
 }
-
+ 
 .footer-note { text-align: center; color: var(--text-muted); font-size: 12px; margin-top: 40px; }
