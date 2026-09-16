@@ -136,30 +136,79 @@ document.getElementById("link-close-btn").addEventListener("click", () => {
 // 새 프로그램 만들기
 // ---------------------------------------------------------------
 
+// 시작/종료 시간 선택창을 30분 단위 목록으로 채운다 (00:00, 00:30, 01:00 ... 23:30).
+// 보통 수업이 정시나 30분 단위로 시작하는 점을 반영해 직접 타이핑 대신 목록에서 고르게 함.
+function buildTimeOptions(selectEl) {
+  let html = '<option value="">시간 선택</option>';
+  for (let h = 0; h < 24; h++) {
+    for (let m = 0; m < 60; m += 30) {
+      const hh = String(h).padStart(2, "0");
+      const mm = String(m).padStart(2, "0");
+      html += `<option value="${hh}:${mm}">${hh}:${mm}</option>`;
+    }
+  }
+  selectEl.innerHTML = html;
+}
+buildTimeOptions(document.getElementById("np-start-time"));
+buildTimeOptions(document.getElementById("np-end-time"));
+
 const newProgramModal = document.getElementById("new-program-modal");
 document.getElementById("open-new-program").addEventListener("click", () => {
-  ["np-name", "np-datetime", "np-fee", "np-travel", "np-etc"].forEach((id) => (document.getElementById(id).value = ""));
+  ["np-name", "np-start-date", "np-start-time", "np-end-date", "np-end-time", "np-fee", "np-travel", "np-etc"].forEach(
+    (id) => (document.getElementById(id).value = "")
+  );
   document.getElementById("np-error").textContent = "";
   newProgramModal.classList.remove("hidden");
 });
 document.getElementById("np-cancel").addEventListener("click", () => newProgramModal.classList.add("hidden"));
 
+// 시작/종료 날짜·시간을 하나로 합쳐 계약서·안내문에 표시할 문구를 만든다.
+// - 종료 날짜가 없거나 시작 날짜와 같으면 하루짜리 강의로 처리
+// - 종료 날짜가 다르면 "1박 2일" 처럼 여러 날에 걸친 프로그램으로 처리
+function formatProgramDateTime(startDate, startTime, endDate, endTime) {
+  if (!startDate) return "";
+  const effectiveEnd = endDate || startDate;
+  const sameDay = effectiveEnd === startDate;
+
+  if (sameDay) {
+    if (startTime && endTime) return `${startDate} ${startTime}~${endTime}`;
+    if (startTime) return `${startDate} ${startTime}~`;
+    return startDate;
+  }
+  if (startTime && endTime) return `${startDate} ${startTime} ~ ${effectiveEnd} ${endTime}`;
+  if (startTime) return `${startDate} ${startTime} ~ ${effectiveEnd}`;
+  return `${startDate} ~ ${effectiveEnd}`;
+}
+
 document.getElementById("np-submit").addEventListener("click", async () => {
   const name = document.getElementById("np-name").value.trim();
-  const dateTime = document.getElementById("np-datetime").value.trim();
+  const startDate = document.getElementById("np-start-date").value;
+  const startTime = document.getElementById("np-start-time").value;
+  const endDate = document.getElementById("np-end-date").value;
+  const endTime = document.getElementById("np-end-time").value;
   const fee = Number(document.getElementById("np-fee").value || 0);
   const travelFee = Number(document.getElementById("np-travel").value || 0);
   const etc = document.getElementById("np-etc").value.trim();
   const errEl = document.getElementById("np-error");
 
-  if (!name || !dateTime) {
-    errEl.textContent = "프로그램명과 강의 일시는 필수입니다.";
+  if (!name || !startDate) {
+    errEl.textContent = "프로그램명과 강의 시작일은 필수입니다.";
     return;
   }
+  if (endDate && endDate < startDate) {
+    errEl.textContent = "종료 날짜는 시작 날짜보다 빠를 수 없습니다.";
+    return;
+  }
+
+  const dateTime = formatProgramDateTime(startDate, startTime, endDate, endTime);
 
   const docRef = await db.collection("programs").add({
     name,
     dateTime,
+    startDate,
+    startTime,
+    endDate: endDate || startDate,
+    endTime,
     fee,
     travelFee,
     etc,
