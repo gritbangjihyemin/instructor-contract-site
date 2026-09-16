@@ -5,6 +5,22 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>강사 계약 정보 입력</title>
 <link rel="stylesheet" href="assets/style.css" />
+<script>
+// 카카오톡 인앱 브라우저는 파일 다운로드(PDF 저장 등)를 제대로 처리하지 못하는 경우가 많아,
+// 카카오톡으로 링크를 열었으면 자동으로 기본 브라우저(Chrome/Safari)로 열리도록 전환한다.
+(function () {
+  var ua = navigator.userAgent.toLowerCase();
+  if (ua.indexOf("kakaotalk") === -1) return;
+
+  var currentUrl = location.href;
+  if (/android/.test(ua)) {
+    location.href =
+      "intent://" + currentUrl.replace(/^https?:\/\//i, "") + "#Intent;scheme=https;package=com.android.chrome;end";
+  } else if (/iphone|ipad|ipod/.test(ua)) {
+    location.href = "kakaotalk://web/openExternal?url=" + encodeURIComponent(currentUrl);
+  }
+})();
+</script>
 </head>
 <body>
 
