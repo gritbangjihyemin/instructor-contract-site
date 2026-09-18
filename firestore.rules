@@ -36,6 +36,15 @@ service cloud.firestore {
       allow create, update, delete: if isAdmin();
     }
 
+    // 짧은 링크(코드) - 관리자가 "링크 복사"에서 생성한 짧은 링크(s.html?c=코드)를
+    // 실제 프로그램 링크(form.html?pid=...)로 바꿔주기 위한 매핑 문서.
+    // 코드를 아는 사람(=짧은 링크를 받은 강사)은 해당 코드 1건만 조회 가능, 생성은 관리자만.
+    match /shortlinks/{code} {
+      allow get: if true;
+      allow list: if isAdmin();
+      allow create, update, delete: if isAdmin();
+    }
+
     // 강사 제출 정보 (주민등록번호, 계좌정보, 서명 포함 - 민감정보)
     match /submissions/{submissionId} {
       // 강사는 로그인 없이 "새로 제출"만 가능 (자기 자신의 정보를 생성)

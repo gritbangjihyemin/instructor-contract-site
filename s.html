@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>강사 계약 정보 입력</title>
+<link rel="stylesheet" href="assets/style.css" />
+</head>
+<body>
+
+<header class="topbar">
+  <h1>강사 계약 정보 입력</h1>
+</header>
+
+<div class="wrap narrow">
+  <div id="redirect-msg" class="card">이동 중입니다...</div>
+  <div id="redirect-not-found" class="card hidden">
+    <p class="error-msg" style="margin:0">이 링크가 유효하지 않습니다. 담당자에게 문의해주세요.</p>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore-compat.js"></script>
+<script src="assets/firebase-config.js"></script>
+<script>
+// 짧은 링크(s.html?c=코드) -> 실제 강사 입력 폼(form.html?pid=...)으로 바꿔주는 리다이렉트 페이지.
+// (관리자 화면에서 "링크 복사" 시 생성되는 shortlinks/{코드} 문서를 조회해서 이동시킴)
+(async function () {
+  const params = new URLSearchParams(window.location.search);
+  const code = params.get("c");
+  const msgEl = document.getElementById("redirect-msg");
+  const notFoundEl = document.getElementById("redirect-not-found");
+
+  function showNotFound() {
+    msgEl.classList.add("hidden");
+    notFoundEl.classList.remove("hidden");
+  }
+
+  if (!code) {
+    showNotFound();
+    return;
+  }
+  try {
+    const doc = await db.collection("shortlinks").doc(code).get();
+    if (!doc.exists || !doc.data().pid) {
+      showNotFound();
+      return;
+    }
+    const basePath = window.location.pathname.replace(/s\.html$/, "");
+    window.location.replace(basePath + "form.html?pid=" + encodeURIComponent(doc.data().pid));
+  } catch (e) {
+    console.error(e);
+    showNotFound();
+  }
+})();
+</script>
+</body>
+</html>
