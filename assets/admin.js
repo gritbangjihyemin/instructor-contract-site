@@ -1,4 +1,3 @@
-
 // ===================================================================
 // 관리자 대시보드 로직 (로그인, 회사정보, 프로그램 게시판)
 // ===================================================================
@@ -87,6 +86,7 @@ async function loadPrograms() {
         <div class="btn-row" style="margin:0">
           <button class="secondary" data-action="link" data-id="${p.id}">링크 복사</button>
           <a class="btn secondary" href="program-detail.html?pid=${p.id}">상세보기</a>
+          <button class="secondary" data-action="edit" data-id="${p.id}">수정</button>
           <button class="secondary" data-action="toggle" data-id="${p.id}" data-active="${p.active !== false}">${p.active === false ? "재개" : "마감"}</button>
           <button class="danger" data-action="delete" data-id="${p.id}">삭제</button>
         </div>
@@ -116,6 +116,8 @@ async function handleProgramAction(btn) {
   const action = btn.dataset.action;
   if (action === "link") {
     showLinkModal(id);
+  } else if (action === "edit") {
+    openEditProgramModal(id);
   } else if (action === "toggle") {
     const currentlyActive = btn.dataset.active === "true";
     await db.collection("programs").doc(id).update({ active: !currentlyActive });
@@ -217,15 +219,44 @@ buildTimeOptions(document.getElementById("np-start-time"));
 buildTimeOptions(document.getElementById("np-end-time"));
  
 const newProgramModal = document.getElementById("new-program-modal");
+let editingProgramId = null; // null이면 새로 만들기, 값이 있으면 해당 프로그램을 수정하는 중
+ 
 document.getElementById("open-new-program").addEventListener("click", () => {
+  editingProgramId = null;
   ["np-name", "np-start-date", "np-start-time", "np-end-date", "np-end-time", "np-fee", "np-travel", "np-etc"].forEach(
     (id) => (document.getElementById(id).value = "")
   );
   document.getElementById("np-fee-type").value = "총액";
   document.getElementById("np-error").textContent = "";
+  document.getElementById("np-modal-title").textContent = "새 프로그램 만들기";
+  document.getElementById("np-submit").textContent = "만들기";
   newProgramModal.classList.remove("hidden");
 });
 document.getElementById("np-cancel").addEventListener("click", () => newProgramModal.classList.add("hidden"));
+ 
+// 기존 프로그램 정보를 모달에 채워넣고 "수정 모드"로 연다.
+// 시작/종료 날짜·시간은 새로 만들 때 저장해둔 개별 필드(startDate 등)를 그대로 불러와 채운다.
+async function openEditProgramModal(id) {
+  const doc = await db.collection("programs").doc(id).get();
+  if (!doc.exists) return;
+  const p = doc.data();
+  editingProgramId = id;
+ 
+  document.getElementById("np-name").value = p.name || "";
+  document.getElementById("np-start-date").value = p.startDate || "";
+  document.getElementById("np-start-time").value = p.startTime || "";
+  // 저장 시 종료 날짜가 없으면 시작 날짜와 같은 값으로 채워뒀으므로, 같으면 하루짜리로 보고 비워둔다.
+  document.getElementById("np-end-date").value = p.endDate && p.endDate !== p.startDate ? p.endDate : "";
+  document.getElementById("np-end-time").value = p.endTime || "";
+  document.getElementById("np-fee-type").value = p.feeType || "총액";
+  document.getElementById("np-fee").value = p.fee || "";
+  document.getElementById("np-travel").value = p.travelFee || "";
+  document.getElementById("np-etc").value = p.etc || "";
+  document.getElementById("np-error").textContent = "";
+  document.getElementById("np-modal-title").textContent = "프로그램 수정";
+  document.getElementById("np-submit").textContent = "수정 완료";
+  newProgramModal.classList.remove("hidden");
+}
  
 // 시작/종료 날짜·시간을 하나로 합쳐 계약서·안내문에 표시할 문구를 만든다.
 // - 종료 날짜가 없거나 시작 날짜와 같으면 하루짜리 강의로 처리
@@ -267,6 +298,25 @@ document.getElementById("np-submit").addEventListener("click", async () => {
   }
  
   const dateTime = formatProgramDateTime(startDate, startTime, endDate, endTime);
+ 
+  if (editingProgramId) {
+    await db.collection("programs").doc(editingProgramId).update({
+      name,
+      dateTime,
+      startDate,
+      startTime,
+      endDate: endDate || startDate,
+      endTime,
+      fee,
+      feeType,
+      travelFee,
+      etc,
+    });
+    newProgramModal.classList.add("hidden");
+    editingProgramId = null;
+    loadPrograms();
+    return;
+  }
  
   const docRef = await db.collection("programs").add({
     name,
@@ -347,3 +397,4 @@ function escapeHtml(str) {
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;");
 }
+ 
