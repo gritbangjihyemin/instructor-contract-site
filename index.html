@@ -78,7 +78,15 @@
     </div>
     <div class="field">
       <label>강사비</label>
-      <input type="number" id="np-fee" placeholder="숫자만 입력 (원)" />
+      <div class="field-row">
+        <select id="np-fee-type">
+          <option value="총액">총액(고정)</option>
+          <option value="일급">일급</option>
+          <option value="시급">시급</option>
+        </select>
+        <input type="number" id="np-fee" placeholder="숫자만 입력 (원)" />
+      </div>
+      <div class="hint">일급/시급 선택 시, 입력한 금액은 "1일당" 또는 "1시간당" 금액으로 표시됩니다.</div>
     </div>
     <div class="field">
       <label>출장여비</label>
