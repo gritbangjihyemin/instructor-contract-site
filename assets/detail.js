@@ -66,9 +66,10 @@ function renderSummary() {
     <h2 style="margin-top:0">${escapeHtml(dProgram.name)}</h2>
     <table>
       <tr><th style="width:100px">일시</th><td>${escapeHtml(dProgram.dateTime || "")}</td></tr>
-      <tr><th>강사비</th><td>${won(dProgram.fee)}</td></tr>
+      <tr><th>강사비</th><td>${won(dProgram.fee)}${feeTypeSuffix(dProgram.feeType)}</td></tr>
       <tr><th>출장여비</th><td>${won(dProgram.travelFee)}</td></tr>
       <tr><th>제출 인원</th><td>${dSubmissions.length}명</td></tr>
+      ${dProgram.etc ? `<tr><th>기타</th><td class="wrap-cell">${escapeHtml(dProgram.etc)}</td></tr>` : ""}
     </table>
   `;
 }
@@ -143,6 +144,7 @@ document.getElementById("export-excel-btn").addEventListener("click", () => {
     "예금주": s.accountHolder,
     "계좌번호": s.accountNumber,
     "강사비": dProgram.fee || 0,
+    "지급방식": dProgram.feeType || "총액",
     "출장여비": dProgram.travelFee || 0,
   }));
   const ws = XLSX.utils.json_to_sheet(rows);
@@ -153,4 +155,3 @@ document.getElementById("export-excel-btn").addEventListener("click", () => {
  
 // won() / escapeHtml() / maskRRN() / fmtDate() 는 assets/contract.js 에 정의된 공용 유틸을 사용합니다.
  
-
