@@ -40,6 +40,7 @@
     <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
       <h2 style="margin:0">프로그램 목록</h2>
       <div class="btn-row" style="margin:0">
+        <a class="btn secondary" href="monthly.html">월별 집계</a>
         <button class="secondary" id="open-company-settings">회사(발주처) 정보 설정</button>
         <button id="open-new-program">+ 새 프로그램 만들기</button>
       </div>
@@ -54,6 +55,19 @@
 <div class="modal-backdrop hidden" id="new-program-modal">
   <div class="modal-box">
     <h3 style="margin-top:0" id="np-modal-title">새 프로그램 만들기</h3>
+    <div class="field">
+      <label>계약 유형</label>
+      <div class="type-toggle">
+        <label class="type-opt"><input type="radio" name="np-type" value="direct" checked />
+          <span><strong>직접 위촉</strong><small>그릿마인드랩이 강사비 지급</small></span></label>
+        <label class="type-opt"><input type="radio" name="np-type" value="matching" />
+          <span><strong>강의섭외대행</strong><small>제안사가 강사비 직접 지급</small></span></label>
+      </div>
+    </div>
+    <div class="field hidden" id="np-proposer-wrap">
+      <label>제안사명 *</label>
+      <input type="text" id="np-proposer" placeholder="강의료를 지급하는 업체명" />
+    </div>
     <div class="field">
       <label>프로그램명</label>
       <input type="text" id="np-name" placeholder="예: OO대학 자기소개서 특강" />
@@ -76,6 +90,7 @@
         1박 2일, 며칠간, 한 달짜리처럼 여러 날에 걸치면 종료 날짜까지 입력하세요.
       </div>
     </div>
+    <div id="np-direct-fields">
     <div class="field">
       <label>강사비</label>
       <div class="field-row">
@@ -85,12 +100,50 @@
           <option value="시급">시급</option>
         </select>
         <input type="number" id="np-fee" placeholder="숫자만 입력 (원)" />
+        <input type="number" id="np-fee-qty" min="0" step="0.5" placeholder="일수/시간" class="hidden" style="max-width:110px" />
       </div>
-      <div class="hint">일급/시급 선택 시, 입력한 금액은 "1일당" 또는 "1시간당" 금액으로 표시됩니다.</div>
+      <div class="hint">일급/시급 선택 시, 입력한 금액은 "1일당" 또는 "1시간당" 금액이에요. 오른쪽 칸에 일수나 시간을 넣으면 월별 강사비 집계에 총액이 계산돼요.</div>
     </div>
     <div class="field">
       <label>출장여비</label>
       <input type="number" id="np-travel" placeholder="숫자만 입력 (원, 없으면 0)" />
+    </div>
+    </div>
+
+    <div id="np-matching-fields" class="hidden">
+      <div class="field">
+        <label>강의 시간 *</label>
+        <div class="field-row">
+          <input type="number" id="np-hours" min="0" step="0.5" placeholder="총 강의 시간 (예: 4)" />
+          <input type="number" id="np-unit" min="0" step="1000" value="10000" />
+        </div>
+        <div class="hint">왼쪽은 총 강의 시간, 오른쪽은 시간당 강의섭외대행비(부가세 별도)예요.</div>
+      </div>
+      <div class="amount-box" id="np-amount-box">
+        <div><span>공급가액</span><strong id="np-supply">0원</strong></div>
+        <div><span>부가세 (10%)</span><strong id="np-vat">0원</strong></div>
+        <div class="total"><span>합계 (강사 입금액)</span><strong id="np-total">0원</strong></div>
+      </div>
+      <div class="field">
+        <label>강의료 입금예정일 <span style="font-weight:400;color:var(--text-muted)">(제안사 → 강사)</span></label>
+        <div class="type-toggle compact">
+          <label class="type-opt"><input type="radio" name="np-paytype" value="fixed" checked /><span><strong>날짜 지정</strong></span></label>
+          <label class="type-opt"><input type="radio" name="np-paytype" value="undecided" /><span><strong>미정</strong></span></label>
+        </div>
+        <input type="date" id="np-paydate" style="margin-top:8px" />
+      </div>
+      <div class="field">
+        <label>대행비 입금기한 <span style="font-weight:400;color:var(--text-muted)">(강사 → 그릿마인드랩)</span></label>
+        <input type="date" id="np-due" />
+        <div class="hint" id="np-due-hint">입금예정일을 넣으면 같은 날(당일)로 자동으로 채워져요.</div>
+        <div class="due-fixed hidden" id="np-due-undecided">강의료를 받은 당일 입금 · 받으면 그릿마인드랩에 연락</div>
+        <div class="deposit-line" id="np-deposit-line"></div>
+      </div>
+      <div class="field">
+        <label>제안사 지급 강의료 <span style="font-weight:400;color:var(--text-muted)">(선택, 참고용)</span></label>
+        <input type="text" id="np-lecture-fee" placeholder="예: 시간당 15만원 / 총 60만원" />
+        <div class="hint">강사에게 보여주는 참고 정보예요. 강의료는 제안사가 강사에게 직접 지급해요.</div>
+      </div>
     </div>
     <div class="field">
       <label>기타</label>
@@ -128,6 +181,15 @@
     <div class="field">
       <label>연락처</label>
       <input type="text" id="cs-phone" />
+    </div>
+    <h4 style="margin:18px 0 4px">강의섭외대행비 입금 계좌</h4>
+    <p class="hint" style="color:var(--text-muted);margin-top:0">강의섭외대행 프로그램에서 강사에게 안내되는 계좌예요.</p>
+    <div class="field-row">
+      <input type="text" id="cs-dep-bank" placeholder="은행명" />
+      <input type="text" id="cs-dep-account" placeholder="계좌번호" />
+    </div>
+    <div class="field" style="margin-top:8px">
+      <input type="text" id="cs-dep-holder" placeholder="예금주" />
     </div>
     <div class="error-msg" id="cs-error"></div>
     <div class="btn-row">

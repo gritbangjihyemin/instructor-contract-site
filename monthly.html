@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>월별 집계</title>
+<link rel="stylesheet" href="assets/style.css" />
+</head>
+<body>
+
+<header class="topbar">
+  <h1>월별 집계</h1>
+  <div class="actions"><a href="index.html" class="btn secondary">← 목록으로</a></div>
+</header>
+
+<div class="wrap">
+
+  <div id="auth-gate" class="card hidden">
+    <p>로그인이 필요합니다. <a href="index.html">관리자 로그인으로 이동</a></p>
+  </div>
+
+  <div id="content" class="hidden">
+    <div class="tab-row" role="tablist">
+      <button type="button" class="tab active" data-tab="matching" role="tab">강의섭외대행비</button>
+      <button type="button" class="tab" data-tab="direct" role="tab">강사비 (직접 위촉)</button>
+    </div>
+
+    <section id="tab-matching">
+    <div class="card">
+      <div class="filter-row">
+        <div class="field" style="margin:0">
+          <label>집계 월</label>
+          <input type="month" id="m-month" />
+        </div>
+        <div class="field" style="margin:0">
+          <label>기준</label>
+          <select id="m-basis">
+            <option value="paid">입금일 기준 (매출 신고용)</option>
+            <option value="lecture">강의일 기준</option>
+          </select>
+        </div>
+        <button id="m-excel-btn">세무사 제출용 엑셀</button>
+      </div>
+      <p class="hint" id="m-basis-hint" style="color:var(--text-muted);margin-bottom:0"></p>
+    </div>
+
+    <div class="stat-row" id="m-stats"></div>
+
+    <div class="card">
+      <h2 style="margin-top:0">건별 내역</h2>
+      <div style="overflow-x:auto">
+        <table>
+          <thead>
+            <tr>
+              <th>기준일</th><th>프로그램명</th><th>제안사</th><th>강사명</th><th>증빙</th><th>증빙 번호</th>
+              <th class="num">공급가액</th><th class="num">부가세</th><th class="num">합계</th><th>증빙 발급</th>
+            </tr>
+          </thead>
+          <tbody id="m-tbody"></tbody>
+        </table>
+      </div>
+      <p class="hint" id="m-empty" style="display:none;color:var(--text-muted)">이 달에 해당하는 내역이 없습니다.</p>
+    </div>
+
+    <div class="card" id="m-unpaid-card">
+      <h2 style="margin-top:0">미입금 건 <span class="muted" style="font-size:14px;font-weight:400">(전체 기간)</span></h2>
+      <div style="overflow-x:auto">
+        <table>
+          <thead>
+            <tr><th>강의일</th><th>프로그램명</th><th>제안사</th><th>강사명</th><th>연락처</th><th class="num">합계</th><th>입금기한</th><th>강의료 수령 연락</th></tr>
+          </thead>
+          <tbody id="m-unpaid-tbody"></tbody>
+        </table>
+      </div>
+      <p class="hint" id="m-unpaid-empty" style="display:none;color:var(--text-muted)">미입금 건이 없습니다.</p>
+    </div>
+    </section>
+
+    <section id="tab-direct" class="hidden">
+    <div class="card">
+      <div class="filter-row">
+        <div class="field" style="margin:0">
+          <label>집계 월</label>
+          <input type="month" id="d-month" />
+        </div>
+        <div class="field" style="margin:0">
+          <label>기준</label>
+          <select id="d-basis">
+            <option value="pay">지급월 기준 (원천세 신고용)</option>
+            <option value="lecture">강의월 기준</option>
+          </select>
+        </div>
+        <button id="d-excel-btn">세무사 제출용 엑셀</button>
+      </div>
+      <p class="hint" id="d-basis-hint" style="color:var(--text-muted);margin-bottom:0"></p>
+    </div>
+
+    <div class="stat-row" id="d-stats"></div>
+
+    <div class="card">
+      <h2 style="margin-top:0">강사별 내역</h2>
+      <div style="overflow-x:auto">
+        <table>
+          <thead>
+            <tr>
+              <th>기준일</th><th>프로그램명</th><th>강사명</th><th>소득 구분</th>
+              <th class="num">지급총액</th><th class="num">소득세</th><th class="num">지방소득세</th><th class="num">실지급액</th><th>지급 계좌</th>
+            </tr>
+          </thead>
+          <tbody id="d-tbody"></tbody>
+        </table>
+      </div>
+      <p class="hint" id="d-empty" style="display:none;color:var(--text-muted)">이 달에 해당하는 내역이 없습니다.</p>
+      <p class="hint" style="color:var(--text-muted)">세금은 사업소득 3.3%, 기타소득 8.8%(필요경비 60%)의 일반 계산식으로 구한 값이에요. 신고 전 세무사 확인을 받아 주세요.</p>
+    </div>
+    </section>
+  </div>
+
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore-compat.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="assets/firebase-config.js"></script>
+<script src="assets/contract.js"></script>
+<script src="assets/monthly.js"></script>
+</body>
+</html>

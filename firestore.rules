@@ -48,7 +48,10 @@ service cloud.firestore {
     // 강사 제출 정보 (주민등록번호, 계좌정보, 서명 포함 - 민감정보)
     match /submissions/{submissionId} {
       // 강사는 로그인 없이 "새로 제출"만 가능 (자기 자신의 정보를 생성)
-      allow create: if
+      // ① 직접 위촉: 주민등록번호·계좌·원천징수 구분 필수 (기존 방식, contractType 필드 없음)
+      // ② 강의섭외대행: 연락처·증빙 유형·증빙 번호 필수, 대상 프로그램도 강의섭외대행이어야 함
+      allow create: if (
+        !('contractType' in request.resource.data) &&
         request.resource.data.programId is string &&
         request.resource.data.instructorName is string &&
         request.resource.data.instructorName.size() > 0 &&
@@ -57,7 +60,21 @@ service cloud.firestore {
         request.resource.data.accountHolder is string &&
         request.resource.data.accountNumber is string &&
         request.resource.data.withholdingType in ['사업소득', '기타소득'] &&
-        request.resource.data.signature is string;
+        request.resource.data.signature is string
+      ) || (
+        request.resource.data.contractType == 'matching' &&
+        request.resource.data.programId is string &&
+        get(/databases/$(database)/documents/programs/$(request.resource.data.programId)).data.contractType == 'matching' &&
+        request.resource.data.instructorName is string &&
+        request.resource.data.instructorName.size() > 0 &&
+        request.resource.data.phone is string &&
+        request.resource.data.receiptType in ['현금영수증', '사업자지출증빙'] &&
+        request.resource.data.receiptNumber is string &&
+        request.resource.data.receiptNumber.size() > 0 &&
+        request.resource.data.signature is string &&
+        request.resource.data.paid == false &&
+        request.resource.data.receiptIssued == false
+      );
 
       // 제출된 정보의 조회(get/list), 수정, 삭제는 관리자만 가능
       // -> 강사 본인도 제출 후에는 서버(Firestore)에서 다시 읽어올 수 없음(URL 공유 등으로 인한 유출 방지)
