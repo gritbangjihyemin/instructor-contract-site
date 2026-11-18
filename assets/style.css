@@ -258,3 +258,72 @@ th { color: var(--text-muted); font-weight: 600; background: #fafbfa; }
 }
 
 .footer-note { text-align: center; color: var(--text-muted); font-size: 12px; margin-top: 40px; }
+
+
+/* ===== 강의섭외대행 ===== */
+.type-toggle { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.type-opt { position: relative; cursor: pointer; margin: 0; font-weight: 400; }
+.type-opt input { position: absolute; opacity: 0; pointer-events: none; }
+.type-opt span {
+  display: flex; flex-direction: column; gap: 2px; height: 100%;
+  padding: 10px 12px; border: 1.5px solid var(--border); border-radius: 8px; background: #fff;
+  transition: border-color .15s, background .15s;
+}
+.type-opt span small { color: var(--text-muted); font-size: 12px; }
+.type-opt input:checked + span { border-color: var(--primary); background: #eef5f2; }
+.type-opt input:focus-visible + span { outline: 2px solid var(--primary-light); outline-offset: 2px; }
+
+.type-badge {
+  display: inline-block; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 999px;
+  margin-right: 6px; vertical-align: 2px;
+}
+.type-badge.direct { background: #e8edf2; color: #3c5468; }
+.type-badge.matching { background: #fbecd9; color: #8a5413; }
+
+.amount-box {
+  border: 1px solid var(--border); border-radius: 8px; background: #fafbf9; padding: 4px 14px; margin: 4px 0 16px;
+}
+.amount-box > div { display: flex; justify-content: space-between; gap: 12px; padding: 8px 0; font-size: 14px; }
+.amount-box > div + div { border-top: 1px dashed var(--border); }
+.amount-box span { color: var(--text-muted); }
+.amount-box strong { font-variant-numeric: tabular-nums; }
+.amount-box .total span { color: var(--text); font-weight: 600; }
+.amount-box .total strong { color: var(--primary); font-size: 17px; }
+
+.inline-check { display: inline-flex; align-items: center; gap: 6px; font-weight: 400; font-size: 13px; margin-top: 6px; color: var(--text-muted); }
+.muted { color: var(--text-muted); font-size: 12px; }
+
+.receipt-chip { display: inline-block; font-size: 12px; padding: 1px 8px; border-radius: 999px; white-space: nowrap; }
+.receipt-chip.cash { background: #e6f2ec; color: #2f5d50; }
+.receipt-chip.biz { background: #e8edf8; color: #34508a; }
+.mini-date { padding: 4px 6px; font-size: 13px; width: 130px; }
+
+.filter-row { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 12px; }
+.filter-row button { margin-left: auto; }
+.stat-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 16px; }
+.stat { background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; display: flex; flex-direction: column; gap: 2px; }
+.stat span { font-size: 13px; color: var(--text-muted); }
+.stat strong { font-size: 20px; font-variant-numeric: tabular-nums; }
+.stat small { font-size: 12px; color: var(--text-muted); }
+.stat.accent { border-color: var(--primary); background: #eef5f2; }
+.stat.accent strong { color: var(--primary); }
+td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+@media (max-width: 640px) {
+  .stat-row { grid-template-columns: 1fr 1fr; }
+  .filter-row button { margin-left: 0; width: 100%; }
+}
+
+.tab-row { display: flex; gap: 6px; margin-bottom: 16px; border-bottom: 1px solid var(--border); }
+.tab-row .tab { background: transparent; color: var(--text-muted); border: none; border-bottom: 3px solid transparent; border-radius: 0; padding: 10px 14px; font-weight: 600; }
+.tab-row .tab.active { color: var(--primary); border-bottom-color: var(--primary); }
+.type-toggle.compact .type-opt span { padding: 8px 12px; }
+.due-fixed { padding: 10px 12px; border-radius: 8px; background: #fbecd9; color: #6b4210; font-size: 14px; font-weight: 600; }
+
+.deposit-line { margin-top: 8px; font-size: 13px; color: var(--text-muted); }
+.deposit-card { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 18px; margin-top: 10px; padding: 10px 14px; border: 1px solid var(--primary); border-radius: 8px; background: #eef5f2; font-size: 14px; }
+.deposit-card > div { display: flex; flex-direction: column; min-width: 0; }
+.deposit-card span { font-size: 12px; color: var(--text-muted); }
+.deposit-card strong { word-break: break-all; }
+.deposit-card button.small { margin-left: auto; padding: 6px 12px; font-size: 13px; }
+.vat-note { margin: 12px 0 0; color: var(--danger); font-size: 13px; line-height: 1.6; font-weight: 600; }
